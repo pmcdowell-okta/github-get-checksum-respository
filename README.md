@@ -1,6 +1,6 @@
 # github-get-checksum-respository
 
-##Get the Master Checksum of a Github Repository
+## Get the Master Checksum of a Github Repository
 
 I wrote this to I could easily check and see if a github repository has changed.
 
