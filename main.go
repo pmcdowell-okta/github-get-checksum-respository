@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"io/ioutil"
 	"encoding/json"
+	"time"
 )
 
 type ShaStruct struct {
@@ -18,29 +19,52 @@ func main() {
 	if len(os.Args) != 1 {
 
 		gitHubRespository := strings.ToLower(os.Args[1]) //"https://hardCodeYourOktaOrg.oktapreview.com"
+		currentCheckSum:=getChecksum(gitHubRespository)
+		duration := time.Second*1
 
-		if (  strings.HasPrefix(gitHubRespository, "https://github.com/")) {
-			gitHubRespository = strings.Replace(gitHubRespository, "https://github.com/", "", -1)
-			gitHubRespository = strings.Replace(gitHubRespository, ".git", "", -1)
-		}
+		for true {
 
-		gitHubRespository = fmt.Sprintf("https://api.github.com/repos/%s/commits/master", gitHubRespository)
+			newChecksum := getChecksum(gitHubRespository) //"https://hardCodeYourOktaOrg.oktapreview.com"
+			fmt.Println("Current Checksum: "+newChecksum)
 
-		fmt.Println(gitHubRespository)
-
-		response, _ := http.Get(gitHubRespository)
-		if response.StatusCode == http.StatusOK {
-			bodyBytes, _ := ioutil.ReadAll(response.Body)
-			//bodyString := string(bodyBytes)
-			//fmt.Println(bodyString)
-
-			dat := ShaStruct{}
-			if err := json.Unmarshal(bodyBytes, &dat); err != nil {
-				panic(err)
+			if (newChecksum!=currentCheckSum) {
+				os.Exit(0)
 			}
 
-			fmt.Println(dat.Sha)
+			time.Sleep(duration)
+
 
 		}
+
+	} else {
+		fmt.Println("Usage: command https://yourgithubrepository.git")
+
 	}
+}
+
+func getChecksum ( githubUrl string)  string {
+
+	gitHubRespository:=githubUrl
+	dat := ShaStruct{}
+
+
+	if (  strings.HasPrefix(gitHubRespository, "https://github.com/")) {
+		gitHubRespository = strings.Replace(gitHubRespository, "https://github.com/", "", -1)
+		gitHubRespository = strings.Replace(gitHubRespository, ".git", "", -1)
+	}
+
+	gitHubRespository = fmt.Sprintf("https://api.github.com/repos/%s/commits/master", gitHubRespository)
+
+	response, _ := http.Get(gitHubRespository)
+	if response.StatusCode == http.StatusOK {
+		bodyBytes, _ := ioutil.ReadAll(response.Body)
+		if err := json.Unmarshal(bodyBytes, &dat); err != nil {
+			panic(err)
+		}
+
+
+	}
+
+	return (dat.Sha)
+
 }
