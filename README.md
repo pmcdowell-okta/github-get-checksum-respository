@@ -9,3 +9,7 @@ exit. The idea is I can run this on a server that is remote, so if something
 changes I can pull the changes and restart the service.
 
 I'm sure there is an easier way to do this, but it was the best I could come up with
+
+You run it like this:
+
+`go run main.go https://github.com/pmcdowell-okta/oktacsv.git`
