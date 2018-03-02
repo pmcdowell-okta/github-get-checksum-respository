@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"encoding/json"
 	"time"
+	"crypto/tls"
+
 )
 
 type ShaStruct struct {
@@ -55,6 +57,7 @@ func getChecksum ( githubUrl string)  string {
 
 	gitHubRespository = fmt.Sprintf("https://api.github.com/repos/%s/commits/master", gitHubRespository)
 
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true} // Ignore SSL
 	response, _ := http.Get(gitHubRespository)
 	if response.StatusCode == http.StatusOK {
 		bodyBytes, _ := ioutil.ReadAll(response.Body)
